@@ -33,15 +33,15 @@ Protoffer: you search we offer
         <table id="main_table" class="nowrap compact">
           <thead>
             <tr>
-              <th class="№">item</th>
-              <th class="it_code">item</th>
-              <th class="it_price">количество</th>
-              <th class="it_price">цена</th>
-              <th class="it_price">сумма</th>
+              <th>item</th>
+              <th>item</th>
+              <th>количество</th>
+              <th>цена</th>
+              <th>сумма</th>
               {% if mans %}
                 {% for m in mans %}
-                  <th class="it_code">{{ m }}</th>
-                  <th class="it_price">цена</th>
+                  <th>{{ m }}</th>
+                  <th>цена</th>
                 {% endfor %}
               {% endif %}
             </tr>
@@ -50,7 +50,7 @@ Protoffer: you search we offer
             {% for l in ms %}
             <tr>
               {% for i in l %}
-                <td class="{{ i }}">{{ i }}</td>
+                <td{% if i.0 %} class="{{i.0}}" {% endif %}>{{ i.1 }}</td>
               {% endfor %}
             </tr>
             {% endfor %}

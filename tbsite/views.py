@@ -87,6 +87,8 @@ def doCopyList ( aid, nname ):
 			lm_descr = "(copy)" + i.lm_descr
 		)
 
+	return nl.id
+
 # всякие там добавки в список
 def listAddView(request, listid):
 	""" добавление аналогов в список """
@@ -135,7 +137,7 @@ def listAddView(request, listid):
 					if ii.it_man_id not in manDict:	# формируем список производителей
 						mm = CPty.objects.get(id=ii.it_man_id)
 						manDict[ ii.it_man_id ] = mm.cp_name
-					nSet[ii.it_man_id] = [ ii.it_code, ai.lm_price ]
+					nSet[ii.it_man_id] = [ ii.it_code, ii.it_base_price ]
 					idSet.append(ii.id)
 					ni = ILMatr.objects.create(
 						lm_list_id = nlId,
@@ -153,7 +155,7 @@ def listAddView(request, listid):
 					if ii.it_man_id not in manDict:	# формируем список производителей
 						mm = CPty.objects.get(id=ii.it_man_id)
 						manDict[ ii.it_man_id ] = mm.cp_name
-					nSet[ii.it_man_id] = [ ii.it_code, ai.lm_price ]
+					nSet[ii.it_man_id] = [ ii.it_code, ii.it_base_price ]
 					idSet.append(ii.id)
 					ni = ILMatr.objects.create(
 						lm_list_id = nlId,
@@ -170,14 +172,14 @@ def listAddView(request, listid):
 		rSet = []
 		manSet = []
 		for m in mSet:
-			ln = [ m[0], m[1], m[2], m[3], m[4] ]		# оригинальные позиции
+			ln = [ ["",m[0]], ["",m[1]], ["",m[2]], ["",m[3]], ["",m[4]] ]		# оригинальные позиции
 			for manId in manDict:
 				if manId in m[5]:		# старые позиции
-					ln.append( m[5][manId][0] )
-					ln.append( m[5][manId][1] )
+					ln.append( ["",m[5][manId][0]] )
+					ln.append( ["",m[5][manId][1]] )
 				elif manId in m[6]:		# новые позиции - надо будет как-то их отметить цветом
-					ln.append( m[6][manId][0] )
-					ln.append( m[6][manId][1] )
+					ln.append( ["my_red",m[6][manId][0]] )
+					ln.append( ["my_red",m[6][manId][1]] )
 				else:
 					ln.append( "-" )
 					ln.append( "-" )

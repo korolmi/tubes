@@ -13,7 +13,8 @@ function sleep(milliseconds) {
 $(document).ready(function(){
 
   $('#main_table').dataTable( {
-        "scrollX": true
+        "scrollX": true,
+        "bAutoWidth": false
   } );
 
   $('#main_table tbody').on( 'click', 'td', function () {

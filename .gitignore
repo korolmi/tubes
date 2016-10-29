@@ -62,6 +62,12 @@ coverage.xml
 *.log
 local_settings.py
 tbsite/migrations/
+tbsite/media/
+tbsite/static/admin/
+tbsite/static/boot*
+tbsite/static/jquery*
+tbsite/static/font*
+
 
 # Flask instance folder
 instance/
