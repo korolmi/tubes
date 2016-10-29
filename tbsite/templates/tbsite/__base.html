@@ -1,0 +1,72 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% block meta_tags %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    {% endblock meta_tags %}
+
+    <title>
+      {% block title %}{% endblock %}
+    </title>
+
+    {% block stylesheets %}
+      <!-- Bootstrap core CSS -->
+      <link rel="stylesheet" href="{% static "bootstrap.min.css" %}">
+      <!-- Bootstrap theme -->
+      <link rel="stylesheet" href="{% static "bootstrap-theme.min.css" %}"> 
+      <link rel="stylesheet" href="{% static "font-awesome.min.css" %}">
+
+      <!-- DataTables -->
+      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-2.2.3/dt-1.10.12/sc-1.4.2/datatables.min.css"/>
+
+      <!-- Custom styles for this template -->
+      <link href="{% static "tbsite.css" %}" rel="stylesheet">
+
+    {% endblock stylesheets %}
+    {% block scripts %}
+      <script src="{% static "jquery.min.js" %}"></script>
+      <script src="{% static "bootstrap.min.js" %}"></script>
+      <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-2.2.3/dt-1.10.12/sc-1.4.2/datatables.min.js"></script>
+    {% endblock %}
+  </head>  
+  <body role="document">
+
+    {% block header %}
+    {% endblock %}
+
+    {% block content %}
+    {% endblock %}
+
+    {% block footer %}
+    <div class="pan_1 my_bblue my_fbig side_padding my_white text-left my_upper">
+      контакты
+    </div>
+    <div class="container-fluid my_bblue ext_gutter my_upper">
+      <div class="col-md-1"></div>
+      <div class="col-md-5 my_white">
+        <p class="my_flarge my_white">email: info@protoffer.ru<br>
+        email для марок: addme@protoffer.ru<br>
+        (c) all rights reserved 2016</p>
+      </div>
+      <div class="col-md-6 no_gutter">
+        <div class="col-md-2"><img src="/media/facebook.png" class="center-block img-responsive"></div>
+        <div class="col-md-2"><img src="/media/twitter.png" class="center-block img-responsive"></div>
+        <div class="col-md-2"><img src="/media/myspace.png" class="center-block img-responsive"></div>
+        <div class="col-md-2"><img src="/media/youtube.png" class="center-block img-responsive"></div>
+        <div class="col-md-2"><img src="/media/flickr.png" class="center-block img-responsive"></div>
+        <div class="col-md-2"><img src="/media/FriendFeed.png" class="center-block img-responsive"></div>
+      </div>
+    </div>
+
+    {% endblock %}
+
+    {% block ready_func %}
+      {% include "tbsite/ready_func.js" %}
+    {% endblock %}
+  </body>
+</html>

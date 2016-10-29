@@ -1,0 +1,72 @@
+{% extends "tbsite/__base.html" %}
+
+{% block title %}
+Protoffer: you search we offer
+{% endblock title %}
+
+
+{% block content %}
+<div class="container-fluid theme-showcase no_gutter" role="main">
+    <div class="container-fluid border_bottom no_gutter">
+        <div class="col-md-3 "> {# logo #}
+          <img src="/media/logo2.png" class="img-responsive">
+        </div>
+        <div class="col-md-6 center_menu my_upper"> {# menu #}
+          <p class="my_fsl my_blue text-center">мои загрузки 
+            <span class="my_grey">||</span>
+            каталог
+            <span class="my_grey">||</span>
+            главная
+          </p>
+        </div>
+        <div class="col-md-3 text-center top_padding2"> {# right thing #}
+          <div class="row">
+          <div class="col-md-3"><img src="/media/man_icon.png" class="img-responsive"></div>
+          <div class="col-md-9 upper_small my_upper"><br>чтобы загрузить файл <span class="my_blue">войдите</span><br>или <span class="my_blue">зарегистрируйтесь</span></div>
+          </div>
+        </div>
+    </div>
+    <div class="container-fluid border_bottom border_top no_gutter">
+      <div class="clearfix"></div>
+      <div class="col-md-10 no_gutter">
+        {% if ms %}
+        <table id="main_table" class="nowrap compact">
+          <thead>
+            <tr>
+              <th class="№">item</th>
+              <th class="it_code">item</th>
+              <th class="it_price">количество</th>
+              <th class="it_price">цена</th>
+              <th class="it_price">сумма</th>
+              {% if mans %}
+                {% for m in mans %}
+                  <th class="it_code">{{ m }}</th>
+                  <th class="it_price">цена</th>
+                {% endfor %}
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for l in ms %}
+            <tr>
+              {% for i in l %}
+                <td class="{{ i }}">{{ i }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>main area</p>
+        {% endif %}
+      </div>
+      <div class="col-md-2 no_gutter">
+        <div class="border ext_padding"><p class="my_fsl">самый экономичный вариант</p></div>
+        <div class="border ext_padding"><p class="my_fsl">усредненный вариант</p></div>
+        <div class="border ext_padding"><p class="my_fsl">пересчитать</p></div>
+        <div class="border ext_padding"><p class="my_fsl">сохранить</p></div>
+      </div>
+    </div>
+</div>
+{% endblock content %}
+

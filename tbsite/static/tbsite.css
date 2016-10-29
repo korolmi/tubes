@@ -1,0 +1,153 @@
+
+ /* стили стардартных элементов  */
+
+p {
+  color: grey;
+  font-size: 15px;
+  text-align: justify;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+}
+
+/* цвета */
+
+.my_grey {
+  color: grey;
+}
+
+.my_bgrey {
+  background-color: grey;
+}
+
+.my_blue {
+  color: #70c7fd;
+}
+
+.my_bblue {
+  background-color: #70c7fd;
+}
+
+.my_white {
+  color: white;
+}
+
+/*  2a2a2a f9f9f9*/
+
+/* шрифты */
+.my_fbig {
+  font-size: 40px;
+  letter-spacing: 4px;
+}
+
+.my_fmed {
+  font-size: 30px;
+  letter-spacing: 3px;
+}
+
+.my_flarge {
+  font-size: 20px;
+}
+
+.my_fsl {
+  font-size: 18px;
+}
+
+.upper_small {
+  font-size: 9px;
+}
+
+.my_upper {
+  text-transform: uppercase;
+}
+
+/* собственные стили для элементов */
+
+.main_div {
+    height: 100vh; 
+    width: 100%;
+    background-image: url(/static/main_bgr.jpg);
+    background-size: 100% 100%;
+    /*overflow: hidden;*/
+}
+
+.pan_1 {
+  margin: 0;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.hdr_1 {
+  margin-bottom: 10px;
+}
+
+.hdr_2 {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.border {
+  border-top: solid 1px;
+  border-bottom: solid 1px;
+  border-left: solid 2px;
+  border-right: solid 2px;
+  border-color: grey;
+}
+
+.border_top {
+  border-top: solid 1px;
+  border-color: grey;
+}
+
+.border_bottom {
+  border-bottom: solid 1px;
+  border-color: grey;
+}
+
+.it_code {
+  width: 250px;
+}
+
+.it_price {
+  width: 100px;
+}
+
+/* всякие выравниватели, добавлятели и т.п. */
+
+.no_gutter {
+    padding-left:0;
+    padding-right:0;
+}
+
+.ext_gutter {
+    padding:3%;
+}
+
+.right_menu {
+  padding-left: 15%;
+  padding-top: 5%;
+}
+
+.center_menu {
+  padding-top: 4%;
+}
+
+.super_padding {
+  padding: 50px;
+}
+
+.top_padding {
+  padding-top: 10px;
+}
+
+.ext_padding {
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+.side_padding {
+  padding-left: 50px;
+  padding-right: 50px;
+}
