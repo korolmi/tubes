@@ -154,3 +154,12 @@ p {
   padding-left: 50px;
   padding-right: 50px;
 }
+
+/* всякое */
+.my_btn {
+  cursor: pointer;
+}
+
+.my_disabled {
+  cursor: not-allowed;
+}

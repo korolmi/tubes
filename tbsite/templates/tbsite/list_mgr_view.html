@@ -56,15 +56,16 @@ Protoffer: you search we offer
             {% endfor %}
           </tbody>
         </table>
+        <pre id="res"></pre>
         {% else %}
         <p>main area</p>
         {% endif %}
       </div>
       <div class="col-md-2 no_gutter">
-        <div class="border ext_padding"><p class="my_fsl">самый экономичный вариант</p></div>
-        <div class="border ext_padding"><p class="my_fsl">усредненный вариант</p></div>
-        <div class="border ext_padding"><p class="my_fsl">пересчитать</p></div>
-        <div class="border ext_padding"><p class="my_fsl">сохранить</p></div>
+        <div id="add_els" class="{{bs.0}} border ext_padding"><p class="my_fsl">самый экономичный вариант</p></div>
+        <div class="{{bs.1}} border ext_padding"><p class="my_fsl">усредненный вариант</p></div>
+        <div id="del_els" class="{{bs.2}} border ext_padding"><p class="my_fsl">удалить</p></div>
+        <div id="save_list" class="{{bs.3}} border ext_padding"><p class="my_fsl">сохранить</p></div>
       </div>
     </div>
 </div>

@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import JsonResponse
 
 from .models import *
 from .logger import *
@@ -49,19 +50,20 @@ def listMgrView(request, listid):
 		rSet = []
 		manSet = []
 		for m in mSet:
-			ln = [ m[0], m[1], m[2], m[3], m[4] ]		# оригинальные позиции
+			ln = [ ["",m[0]], ["",m[1]], ["",m[2]], ["",m[3]], ["",m[4]] ]		# оригинальные позиции
 			for manId in manDict:
 				if manId in m[5]:
-					ln.append( m[5][manId][0] )
-					ln.append( m[5][manId][1] )
+					ln.append( ["",m[5][manId][0]] )
+					ln.append( ["",m[5][manId][1]] )
 				else:
-					ln.append( "-" )
-					ln.append( "-" )
+					ln.append( ["","-"] )
+					ln.append( ["","-"] )
 			rSet.append ( ln )
 		for manId in manDict:
 			manSet.append(manDict[manId])
 
-		context = { "ms": rSet, "mans": manSet }
+		bst = [ "my_btn", "my_disabled", "my_disabled", "my_disabled"]
+		context = { "ms": rSet, "mans": manSet, "bs": bst }
 		return render ( request, 'tbsite/list_mgr_view.html', context )
 
 def doCopyList ( aid, nname ):
@@ -89,12 +91,68 @@ def doCopyList ( aid, nname ):
 
 	return nl.id
 
+def doDeleteList ( ol ):
+	""" удаляет список со всеми элементам """
+
+	# удаляем элементы
+	for i in ILMatr.objects.filter(lm_list_id=ol.id):
+		i.delete()
+	# удяляем список 
+	ol.delete()
+
+def doSaveList ( req, lid ):
+	""" Сохраняет список из черновика - фактически переименовывает и заменяет is_found 
+		в параметрах передается оригинальный список - не черновик
+	"""
+
+	ol = ItemList.objects.get(id=lid)	
+
+	# находим черновик
+	ll = ItemList.objects.filter(ls_name="(DRAFT)"+ol.ls_name)
+	if len(ll)==0 or len(ll)>1:
+		data = {'id': lid, 'resMsg': "Что-то не так с черновиком..." }
+		return data
+	il = ll[0]	
+
+	il.ls_name = ol.ls_name
+	il.save()
+
+	# проходим по товарам и меняем признак lm_is_found
+	lItems = ILMatr.objects.filter(lm_list_id=il.id,lm_is_found=True)
+	for i in lItems:
+		i.lm_is_found = False
+		i.save()
+
+	# удаляем старый список
+	doDeleteList(ol)
+
+	data = {'id': il.id, 'resMsg': "" }
+	return data
+
+def doDelEls(request,listid):
+	""" удаляет выделенные элементы из списка """
+
+	idList = request.POST.get('idls').strip().split()
+
+	for i in idList:
+		aEl = ILMatr.objects.get(id=int(i))
+		aEl.delete()
+
+	data = { 'id': listid, 'resMsg': "" }
+
+	return data
+
 # всякие там добавки в список
 def listAddView(request, listid):
 	""" добавление аналогов в список """
 
 	if request.method == 'POST':	# команды от клиента, исполняем (если будут здесь)
 		if request.is_ajax():		
+			data = {}
+			if int(request.POST.get('cmd'))==1:
+				data = doSaveList(request,listid)
+			if int(request.POST.get('cmd'))==2:
+				data = doDelEls(request,listid)
 			return JsonResponse(data)
 	else:	# отрисовываем список
 		# создаем черновик списка, если он не существует
@@ -124,7 +182,7 @@ def listAddView(request, listid):
 				if ii.it_man_id not in manDict:	# формируем список производителей
 					mm = CPty.objects.get(id=ii.it_man_id)
 					manDict[ ii.it_man_id ] = mm.cp_name
-				aSet[ii.it_man_id] = [ ii.it_code, ai.lm_price ]
+				aSet[ii.it_man_id] = [ ii.it_code, ai.lm_price, ai.id, ai.lm_is_found ]
 				idSet.append(ii.id)
 			mii = Items.objects.get(id=mi.lm_item_id)
 			idSet.append(mii.id)
@@ -137,7 +195,6 @@ def listAddView(request, listid):
 					if ii.it_man_id not in manDict:	# формируем список производителей
 						mm = CPty.objects.get(id=ii.it_man_id)
 						manDict[ ii.it_man_id ] = mm.cp_name
-					nSet[ii.it_man_id] = [ ii.it_code, ii.it_base_price ]
 					idSet.append(ii.id)
 					ni = ILMatr.objects.create(
 						lm_list_id = nlId,
@@ -146,8 +203,10 @@ def listAddView(request, listid):
 						lm_quan = mi.lm_quan,
 						lm_price = ii.it_base_price,
 						lm_rate = n.il_rate,
+						lm_is_found = True,
 						lm_descr = "Created from orig->repl"
 					)
+					nSet[ii.it_man_id] = [ ii.it_code, ii.it_base_price, ni.id ]
 			nItems = ItemLinks.objects.filter(il_repl_id=mii.id)
 			for n in nItems:
 				if n.il_orig_id not in idSet:	# такого в списке не было - добавляем
@@ -155,7 +214,6 @@ def listAddView(request, listid):
 					if ii.it_man_id not in manDict:	# формируем список производителей
 						mm = CPty.objects.get(id=ii.it_man_id)
 						manDict[ ii.it_man_id ] = mm.cp_name
-					nSet[ii.it_man_id] = [ ii.it_code, ii.it_base_price ]
 					idSet.append(ii.id)
 					ni = ILMatr.objects.create(
 						lm_list_id = nlId,
@@ -164,28 +222,34 @@ def listAddView(request, listid):
 						lm_quan = mi.lm_quan,
 						lm_price = ii.it_base_price,
 						lm_rate = n.il_rate,
+						lm_is_found = True,
 						lm_descr = "Created from repl->orig"
 					)
-			mSet.append([ mi.lm_order, mii.it_code, mi.lm_quan, mi.lm_price, mi.lm_price*mi.lm_quan,aSet,nSet ])
+					nSet[ii.it_man_id] = [ ii.it_code, ii.it_base_price, ni.id ]					
+			mSet.append([ mi.lm_order, [mii.it_code,mi.id], mi.lm_quan, mi.lm_price, mi.lm_price*mi.lm_quan,aSet,nSet ])
 
 		# преобразуем аналоги в линейные списки
 		rSet = []
 		manSet = []
 		for m in mSet:
-			ln = [ ["",m[0]], ["",m[1]], ["",m[2]], ["",m[3]], ["",m[4]] ]		# оригинальные позиции
+			ln = [ ["",m[0]], [str(m[1][1])+" c_sel",m[1][0]], ["",m[2]], ["",m[3]], ["",m[4]] ]		# оригинальные позиции
 			for manId in manDict:
-				if manId in m[5]:		# старые позиции
-					ln.append( ["",m[5][manId][0]] )
+				if manId in m[5] and ( not m[5][manId][3]):		# старые позиции
+					ln.append( ["cs_"+str(m[5][manId][2])+" c_sel",m[5][manId][0]] )
 					ln.append( ["",m[5][manId][1]] )
-				elif manId in m[6]:		# новые позиции - надо будет как-то их отметить цветом
-					ln.append( ["my_red",m[6][manId][0]] )
-					ln.append( ["my_red",m[6][manId][1]] )
+				elif manId in m[5] and  m[5][manId][3]:			# найденные не сохраненные позиции
+					ln.append( ["cs_"+str(m[5][manId][2])+" c_sel my_red",m[5][manId][0]] )
+					ln.append( ["",m[5][manId][1]] )
+				elif manId in m[6]:		# новые позиции 
+					ln.append( ["cs_"+str(m[6][manId][2])+" c_sel my_red",m[6][manId][0]] )
+					ln.append( ["",m[6][manId][1]] )
 				else:
-					ln.append( "-" )
-					ln.append( "-" )
+					ln.append( ["","-"] )
+					ln.append( ["","-"] )
 			rSet.append ( ln )
 		for manId in manDict:
 			manSet.append(manDict[manId])
 
-		context = { "ms": rSet, "mans": manSet }
+		bst = [ "my_disabled", "my_disabled", "my_btn", "my_btn"]
+		context = { "ms": rSet, "mans": manSet, "bs": bst }
 		return render ( request, 'tbsite/list_mgr_view.html', context )

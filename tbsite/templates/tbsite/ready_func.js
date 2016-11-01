@@ -12,19 +12,29 @@ function sleep(milliseconds) {
 
 $(document).ready(function(){
 
+  $("#res").hide();
+
   $('#main_table').dataTable( {
         "scrollX": true,
-        "bAutoWidth": false
+        "bAutoWidth": false,
+        dom: 'Blfrtip',
+        lengthMenu: [
+            [ 10, 25, 50, -1 ],
+            [ '10', '25', '50', 'all' ]
+        ],
   } );
 
   $('#main_table tbody').on( 'click', 'td', function () {
-      /*alert($(this).attr("class"));*/
-        if ( $(this).hasClass('my_bblue') ) {
-            $(this).removeClass('my_bblue');
-        }
-        else {
-            $(this).addClass('my_bblue');
-        }
+    if ( $(this).hasClass("c_sel") ){
+      cl = $(this).attr("class").split(" ")[0]
+      /*alert(cl);*/
+      if ( $("."+cl).hasClass('my_bblue') ) {
+          $("."+cl).removeClass('my_bblue');
+      }
+      else {
+          $("."+cl).addClass('my_bblue');
+      }
+    }
   } );
 
 });
@@ -46,93 +56,102 @@ function getCookie(name) {
  return cookieValue;
 }
 
-//For doing AJAX post
-var  pid = 0;
-var  fid = 0;
+$("#add_els").click(function(e) {
 
-// PROJECTS ==================================================================
-// ADD TESTS
-$("#add_test").click(function(e) {
-  e.preventDefault();
-
-  if ( $("#add_test").html()=="Добавить тест" ){
-    $("#add_test").html("Спрятать список");
-    $("#test_sel").show()    
+  if ( !$(this).hasClass("my_disabled") ){
+    lid = window.location.href.split("/")[4];
+    alert(lid);
+    window.location.href = "/listadd/"+lid+"/";
+    return false;
   }
-  else{
-    $("#add_test").html("Добавить тест");
-    $("#test_sel").hide()    
+
+});
+
+
+$("#save_list").click(function(e) {
+
+  if ( !$(this).hasClass("my_disabled") ){
+
+    e.preventDefault();
+    var csrftoken = getCookie('csrftoken');
+
+    $.ajax({
+            url : window.location.href, // the endpoint,commonly same url
+            type : "POST", // http method
+            data : { 
+              csrfmiddlewaretoken : csrftoken,
+              cmd: 1
+            }, 
+
+     // handle a successful response
+     success : function(json) {
+        console.log(json); // another sanity check
+        if ( json.resMsg.length ) {
+          $("#res").show();
+          $("#res").html(json.resMsg);
+        }
+        else{
+          window.location.href = "/listmgr/"+json.id.toString()+"/";
+        }
+     },
+
+     // handle a non-successful response
+     error : function(xhr,errmsg,err) {
+       console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+     }
+     });
   }
 });
 
-function addTestItem ( c ){ // adds test in the beginning of the list in the project tests table
+$("#del_els").click(function(e) {
 
-  $("#tlist_head").after("<tr class='tst_line' tcode='"+c+"' ordno='+'><td>+</td><td>"+c+"</td><td>name will come after refresh...</td></tr>");
-  $("#save_proj").attr("disabled",false);
-  $("#save_tests").attr("disabled",true);
 
-}
+  if ( !$(this).hasClass("my_disabled") ){
 
-function delTestItem ( c ){ // deletes current test item
+    var ids = "";
 
-  $("#code_"+c).remove();
-  $("#save_proj").attr("disabled",false);
-  $("#save_tests").attr("disabled",true);
+    $(".my_bblue").each(function (index, value) {
+      cll = $(this).attr('class');
+      if ( cll.indexOf("cs_")>=0 ){
+        ist = cll.indexOf("cs_");
+        ifn = cll.indexOf(" ",ist);
+        anId = cll.substr(ist+3,ifn-ist-3);
+        ids += anId + " ";
+      }
+    });
 
-}
+    alert(ids);
 
-function moveDownItem ( c ){ // moves current test item down one line (swap lines)
+    e.preventDefault();
+    var csrftoken = getCookie('csrftoken');
 
-  var fBtn = $("#code_"+c).next().children().first().children().first();    // this button will become first (after swap)
-  var sBtn = $("#code_"+c).children().first().children().first();           // this button will become second
-  if ( fBtn.prop("disabled")==true ){
-    fBtn.prop("disabled",false);
-    sBtn.prop("disabled",true);
+    $.ajax({
+            url : window.location.href, // the endpoint,commonly same url
+            type : "POST", // http method
+            data : { 
+              csrfmiddlewaretoken : csrftoken,
+              idls: ids, 
+              cmd: 2
+            }, 
+
+     // handle a successful response
+     success : function(json) {
+        console.log(json); // another sanity check
+        if ( json.resMsg.length ) {
+          $("#res").show();
+          $("#res").html(json.resMsg);
+        }
+        else{
+          window.location.href = "/listadd/"+json.id.toString()+"/";
+        }
+     },
+
+     // handle a non-successful response
+     error : function(xhr,errmsg,err) {
+       console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+     }
+     });
   }
-  $("#code_"+c).insertAfter($("#code_"+c).next());
-
-}
-
-// SAVE PROJECT
-$("#save_proj").click(function(e) {
-
-  e.preventDefault();
-  var csrftoken = getCookie('csrftoken');
-
-  var pdir = $("#InputDir").val();
-  var pname = $("#InputName").val();
-  var pdocu = $("#InputDocu").val();
-  var popts = $("#InputOpts").val();
-  var tests = "";
-  $(".tst_line").each(function() {
-    tests += $(this).attr('ordno')+":"+$(this).attr('tcode')+" ";
-  });
-
-  $.ajax({
-          url : window.location.href, // the endpoint,commonly same url
-          type : "POST", // http method
-          data : { 
-            csrfmiddlewaretoken : csrftoken,
-            pdir: pdir,
-            pname: pname,
-            pdocu: pdocu,
-            opts: popts,
-            tests: tests,
-            cmd: 3
-          }, // data sent with the post request
-
-   // handle a successful response
-   success : function(json) {
-      console.log(json); // another sanity check
-      window.location.href = "/project/"+json.id.toString()+"/";
-   },
-
-   // handle a non-successful response
-   error : function(xhr,errmsg,err) {
-     console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-   }
-   });
-
 });
 
 // SAVE TESTS

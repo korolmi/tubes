@@ -129,6 +129,7 @@ class ILMatr (models.Model):
 	lm_quan = models.IntegerField('количество')
 	lm_price = models.DecimalField('цена', max_digits=8, decimal_places=2)
 	lm_rate = models.IntegerField('близость к оригиналу')
+	lm_is_found = models.BooleanField('еще не сохраненный аналог',default=False)
 	lm_descr = models.CharField('описание',max_length=10000,blank=True, null=True)
 
 	class Meta:
